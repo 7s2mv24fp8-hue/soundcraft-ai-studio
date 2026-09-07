@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SoundCraft AI — All-in-One AI Music Studio & Mastering</title>
+  <meta name="description" content="Generate AI beats, record studio vocals, mix with pro effects, master for Spotify & Apple Music in 1 click, and export audience-ready songs.">
+  
+  <!-- Modern Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body class="dark-theme">
+  <!-- Top App Header / Transport Bar -->
+  <header class="studio-header">
+    <div class="logo-area">
+      <div class="brand-badge">
+        <span class="brand-pulse"></span>
+        <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 18V5l12-2v13"></path>
+          <circle cx="6" cy="18" r="3"></circle>
+          <circle cx="18" cy="16" r="3"></circle>
+        </svg>
+      </div>
+      <div class="brand-info">
+        <h1 class="brand-title">SOUNDCRAFT <span class="ai-badge">AI 2.0</span></h1>
+        <p class="brand-tagline">AI Beatmaking • Vocal Recording • Pro Mixing • 1-Click Master</p>
+      </div>
+    </div>
+
+    <!-- Master Transport Controls -->
+    <div class="transport-bar">
+      <div class="transport-btn-group">
+        <button id="btn-transport-start" class="btn-transport" title="Return to Start">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+        </button>
+        <button id="btn-transport-play" class="btn-transport btn-play-main" title="Play/Pause (Spacebar)">
+          <svg id="play-icon" viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          <svg id="pause-icon" class="hidden" viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+        </button>
+        <button id="btn-transport-stop" class="btn-transport" title="Stop">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M6 6h12v12H6z"/></svg>
+        </button>
+        <button id="btn-transport-loop" class="btn-transport active" title="Toggle Loop">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 22l-4-4 4-4M21 15.5A7.5 7.5 0 005.68 9.5L3 12M17 2l4 4-4 4M3 8.5A7.5 7.5 0 0018.32 14.5L21 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Time & Tempo Readouts -->
+      <div class="transport-readouts">
+        <div class="readout-box time-code">
+          <span class="readout-label">TIME</span>
+          <span id="display-time" class="readout-value font-mono">00:00.0</span>
+        </div>
+        <div class="readout-box bpm-box">
+          <span class="readout-label">BPM</span>
+          <div class="bpm-control">
+            <button id="btn-bpm-dec" class="bpm-btn">-</button>
+            <input type="number" id="input-bpm" min="60" max="180" value="130" class="readout-value font-mono">
+            <button id="btn-bpm-inc" class="bpm-btn">+</button>
+          </div>
+        </div>
+        <div class="readout-box key-box">
+          <span class="readout-label">KEY & SCALE</span>
+          <select id="select-global-key" class="key-selector">
+            <option value="C minor">C Minor</option>
+            <option value="C# minor">C# Minor</option>
+            <option value="D minor">D Minor</option>
+            <option value="D# minor">D# Minor</option>
+            <option value="E minor">E Minor</option>
+            <option value="F minor">F Minor</option>
+            <option value="F# minor">F# Minor</option>
+            <option value="G minor">G Minor</option>
+            <option value="G# minor">G# Minor</option>
+            <option value="A minor" selected>A Minor</option>
+            <option value="A# minor">A# Minor</option>
+            <option value="B minor">B Minor</option>
+            <option value="C major">C Major</option>
+            <option value="G major">G Major</option>
+            <option value="D major">D Major</option>
+            <option value="F major">F Major</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Master Audio Level Meter & Quick Master Switch -->
+    <div class="header-master-status">
+      <div class="master-loudness-meter">
+        <div class="meter-bar-container">
+          <div id="master-meter-l" class="meter-bar"></div>
+        </div>
+        <div class="meter-bar-container">
+          <div id="master-meter-r" class="meter-bar"></div>
+        </div>
+      </div>
+      <div class="master-quick-badge" id="header-master-pill">
+        <span class="status-dot"></span>
+        <span id="header-master-name">UNMASTERED</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Studio Navigation Tabs -->
+  <nav class="studio-workflow-nav">
+    <button class="nav-step-btn active" data-tab="tab-beatmaker" id="nav-btn-beatmaker">
+      <span class="step-num">1</span>
+      <span class="step-icon">✨</span>
+      <span class="step-text">AI Beatmaker</span>
+    </button>
+    <button class="nav-step-btn" data-tab="tab-vocal" id="nav-btn-vocal">
+      <span class="step-num">2</span>
+      <span class="step-icon">🎙️</span>
+      <span class="step-text">Record Studio</span>
+    </button>
+    <button class="nav-step-btn" data-tab="tab-mixer" id="nav-btn-mixer">
+      <span class="step-num">3</span>
+      <span class="step-icon">🎛️</span>
+      <span class="step-text">Pro Mix & FX</span>
+    </button>
+    <button class="nav-step-btn" data-tab="tab-master" id="nav-btn-master">
+      <span class="step-num">4</span>
+      <span class="step-icon">⚡</span>
+      <span class="step-text">AI 1-Click Master</span>
+    </button>
+    <button class="nav-step-btn" data-tab="tab-export" id="nav-btn-export">
+      <span class="step-num">5</span>
+      <span class="step-icon">🚀</span>
+      <span class="step-text">Audience Ready Release</span>
+    </button>
+  </nav>
+
+  <!-- Studio Main Content Panels -->
+  <main class="studio-workspace">
+    
+    <!-- ============================================== -->
+    <!-- TAB 1: AI BEATMAKER & SEQUENCER                -->
+    <!-- ============================================== -->
+    <section id="tab-beatmaker" class="studio-tab-panel active">
+      <div class="beatmaker-grid">
+        <!-- AI Prompt & Style Generator Panel -->
+        <div class="ai-prompt-card glass-panel">
+          <div class="panel-header">
+            <div class="panel-title-wrap">
+              <span class="panel-icon">🤖</span>
+              <div>
+                <h2 class="panel-title">AI Beat Generator</h2>
+                <p class="panel-subtitle">Describe your vibe or choose a hitmaker style preset</p>
+              </div>
+            </div>
+            <button id="btn-random-prompt" class="btn-text-action">🎲 Surprise Me</button>
+          </div>
+
+          <!-- Prompt Input Box -->
+          <div class="prompt-input-wrapper">
+            <textarea id="ai-beat-prompt" placeholder="e.g. Punchy 140 BPM Trap beat with rolling hi-hats, hard sliding 808 sub, and dark ambient melody..." rows="3"></textarea>
+            <button id="btn-generate-ai-beat" class="btn-primary-glow btn-gen-beat">
+              <span class="btn-sparkle">✨</span>
+              <span class="btn-text">Generate AI Beat</span>
+            </button>
+          </div>
+
+          <!-- Quick Genre Style Pills -->
+          <div class="style-presets-bar">
+            <span class="preset-label">Styles:</span>
+            <button class="style-pill active" data-style="trap">🔥 Trap / Hip-Hop</button>
+            <button class="style-pill" data-style="lofi">☕ Lo-Fi Chill</button>
+            <button class="style-pill" data-style="drill">⚡ UK / NY Drill</button>
+            <button class="style-pill" data-style="synthwave">🌆 Cyber Synthwave</button>
+            <button class="style-pill" data-style="pop">✨ Modern Pop / R&B</button>
+            <button class="style-pill" data-style="house">🪩 Club House / EDM</button>
+            <button class="style-pill" data-style="acoustic">🎸 Melodic Acoustic</button>
+          </div>
+
+          <!-- Generative Parameters -->
+          <div class="beat-params-row">
+            <div class="param-item">
+              <label>Energy / Density</label>
+              <input type="range" id="param-beat-density" min="1" max="5" value="4" class="slider-styled">
+              <span id="density-val" class="param-val">High (4/5)</span>
+            </div>
+            <div class="param-item">
+              <label>Swing / Groove</label>
+              <input type="range" id="param-beat-swing" min="0" max="100" value="30" class="slider-styled">
+              <span id="swing-val" class="param-val">30%</span>
+            </div>
+            <div class="param-item">
+              <label>Harmonic Mood</label>
+              <select id="param-beat-mood" class="select-styled">
+                <option value="dark">Dark & Aggressive</option>
+                <option value="chill">Smooth & Relaxed</option>
+                <option value="uplifting">Energetic & Uplifting</option>
+                <option value="melancholic">Emotional & Nostalgic</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive 16-Step Beat Grid & Stems -->
+        <div class="sequencer-card glass-panel">
+          <div class="panel-header">
+            <div class="panel-title-wrap">
+              <span class="panel-icon">🥁</span>
+              <div>
+                <h3 class="panel-title">Beat Arranger & Stem Sequencer</h3>
+                <p class="panel-subtitle">16-Step Pattern • Live Stems • Click grid to customize</p>
+              </div>
+            </div>
+            <div class="seq-actions">
+              <button id="btn-seq-clear" class="btn-subtle" title="Clear Grid">Clear</button>
+              <button id="btn-seq-mutate" class="btn-subtle" title="Add Drum Fill / Variation">Mutate Fill 🪄</button>
+            </div>
+          </div>
+
+          <!-- 16-Step Visual Timeline Header -->
+          <div class="step-indicator-bar" id="step-indicators">
+            <!-- Dynamically populated 1..16 -->
+          </div>
+
+          <!-- Sequencer Tracks Grid -->
+          <div class="sequencer-matrix" id="sequencer-matrix">
+            <!-- Stems: Kick, Snare/Clap, Hi-Hat, 808 Bass, Synth Lead, Chords, FX -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- TAB 2: VOCAL & INSTRUMENT RECORDING STUDIO     -->
+    <!-- ============================================== -->
+    <section id="tab-vocal" class="studio-tab-panel">
+      <div class="vocal-studio-grid">
+        <!-- Mic & Recording Control Deck -->
+        <div class="rec-control-card glass-panel">
+          <div class="panel-header">
+            <div class="panel-title-wrap">
+              <span class="panel-icon">🎙️</span>
+              <div>
+                <h2 class="panel-title">Vocal & Instrument Booth</h2>
+                <p class="panel-subtitle">Ultra-low latency studio capture with direct monitoring</p>
+              </div>
+            </div>
+            <div class="rec-status-indicator" id="rec-status-pill">
+              <span class="status-light"></span>
+              <span id="rec-status-text">MIC STANDBY</span>
+            </div>
+          </div>
+
+          <!-- Big Record Action Button & Countdown -->
+          <div class="big-record-hub">
+            <button id="btn-record-main" class="btn-record-circle" title="Click to Record Vocals">
+              <div class="rec-inner-circle">
+                <svg viewBox="0 0 24 24" width="36" height="36" fill="currentColor"><circle cx="12" cy="12" r="9"/></svg>
+              </div>
+              <span class="rec-btn-label" id="rec-btn-label">START RECORDING</span>
+            </button>
+            
+            <div id="rec-countdown" class="rec-countdown-overlay hidden">
+              <span class="countdown-num">3</span>
+            </div>
+          </div>
+
+          <!-- Live Recording Meter & Device Controls -->
+          <div class="rec-device-controls">
+            <div class="device-toggle-row">
+              <button id="btn-mic-enable" class="btn-toggle-switch active">
+                <span class="toggle-icon">🎤</span>
+                <span>Enable Microphone</span>
+              </button>
+              <button id="btn-direct-monitor" class="btn-toggle-switch">
+                <span class="toggle-icon">🎧</span>
+                <span>Direct Monitor (Headphones)</span>
+              </button>
+              <button id="btn-load-demo-vocal" class="btn-secondary" title="Load high quality vocal track to test without mic">
+                <span>🎵 Load Demo Vocal</span>
+              </button>
+            </div>
+
+            <div class="rec-gain-row">
+              <div class="gain-control-item">
+                <label>Input Gain</label>
+                <input type="range" id="mic-input-gain" min="0" max="200" value="100" class="slider-styled">
+                <span id="mic-gain-val" class="param-val">100%</span>
+              </div>
+              <div class="gain-control-item">
+                <label>Metronome</label>
+                <button id="btn-metronome" class="btn-toggle-switch">
+                  <span>⏱️ Metronome Off</span>
+                </button>
+              </div>
+              <div class="gain-control-item">
+                <label>Count-in</label>
+                <select id="select-countin" class="select-styled">
+                  <option value="1">1 Bar (4 Beats)</option>
+                  <option value="2">2 Bars (8 Beats)</option>
+                  <option value="0">Immediate</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Waveform & Recorded Takes Deck -->
+        <div class="rec-waveform-card glass-panel">
+          <div class="panel-header">
+            <div class="panel-title-wrap">
+              <span class="panel-icon">🌊</span>
+              <div>
+                <h3 class="panel-title">Live Vocal Waveform & Takes</h3>
+                <p class="panel-subtitle">Visual timeline of your recorded audio</p>
+              </div>
+            </div>
+            <div class="waveform-actions">
+              <button id="btn-clear-takes" class="btn-subtle">Clear Take</button>
+              <button id="btn-play-vocal-solo" class="btn-subtle">Solo Vocal 🎧</button>
+            </div>
+          </div>
+
+          <!-- Live Waveform Canvas -->
+          <div class="waveform-canvas-container">
+            <canvas id="canvas-vocal-waveform" width="900" height="180"></canvas>
+            <div id="vocal-playhead" class="vocal-playhead-line"></div>
+          </div>
+
+          <!-- Takes Manager List -->
+          <div class="takes-manager">
+            <div class="takes-header">
+              <span class="takes-title">Track Audio Stems:</span>
+              <span id="takes-count" class="badge-count">1 Active Track</span>
+            </div>
+            <div id="takes-list-container" class="takes-list">
+              <!-- Populated dynamically: Master Beat Track + Vocal Track -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- TAB 3: PRO MIXING CONSOLE & FX RACK            -->
+    <!-- ============================================== -->
+    <section id="tab-mixer" class="studio-tab-panel">
+      <div class="mixer-layout-grid">
+        <!-- Multi-Track Channel Strips -->
+        <div class="channel-strips-card glass-panel">
+          <div class="panel-header">
+            <div class="panel-title-wrap">
+              <span class="panel-icon">🎚️</span>
+              <div>
+                <h2 class="panel-title">Multi-Track Console</h2>
+                <p class="panel-subtitle">Individual stem balancing, pan, solo & mute</p>
+              </div>
+            </div>
+            <button id="btn-reset-mixer" class="btn-text-action">Reset Faders</button>
+          </div>
+
+          <!-- Channel Strips Container -->
+          <div class="channel-strips-scroll" id="mixer-channel-strips">
+            <!-- Dynamically populated: Drums, 808 Bass, Synth, Chords, Vocal, FX -->
+          </div>
+        </div>
+
+        <!-- Studio DSP FX Rack -->
+        <div class="dsp-fx-rack glass-panel">
+          <div class="panel-header">
+            <div class="panel-title-wrap">
+              <span class="panel-icon">⚡</span>
+              <div>
+                <h2 class="panel-title">Vocal & Master FX Chain</h2>
+                <p class="panel-subtitle">Auto-Tune • 5-Band Visual EQ • Compressor • Reverb • Echo</p>
+              </div>
+            </div>
+            <div class="fx-target-select">
+              <label>Target Track:</label>
+              <select id="select-fx-target" class="select-styled">
+                <option value="vocal">🎙️ Lead Vocal</option>
+                <option value="master">🌐 Master Output</option>
+                <option value="beat">🥁 Beat Stems</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Interactive FX Tabs -->
+          <div class="fx-category-tabs">
+            <button class="fx-tab-btn active" data-fx="autotune">Auto-Tune / Pitch</button>
+            <button class="fx-tab-btn" data-fx="eq">5-Band Parametric EQ</button>
+            <button class="fx-tab-btn" data-fx="comp">Dynamics Compressor</button>
+            <button class="fx-tab-btn" data-fx="space">Reverb & Echo Space</button>
+            <button class="fx-tab-btn" data-fx="warmth">Analog Saturation</button>
+          </div>
+
+          <!-- FX Panel Bodies -->
+          <div class="fx-body-container">
+            <!-- 1. Auto-Tune Pitch Shifter / Snap -->
+            <div id="fx-panel-autotune" class="fx-panel-section active">
+              <div class="fx-header-row">
+                <div class="fx-power-toggle">
+                  <input type="checkbox" id="toggle-autotune" checked>
+                  <label for="toggle-autotune">Auto-Tune Vocal Polish Active</label>
+                </div>
+                <span class="fx-preset-badge">Travis / Drake Style</span>
+              </div>
+              <div class="knobs-row">
+                <div class="knob-control">
+                  <div class="knob-ring" data-param="tune-speed">
+                    <input type="range" id="param-tune-speed" min="0" max="100" value="85" class="slider-rotary">
+                  </div>
+                  <label>Retune Speed</label>
+                  <span id="tune-speed-val" class="knob-val">85% (Fast)</span>
+                </div>
+                <div class="knob-control">
+                  <div class="knob-ring" data-param="tune-depth">
+                    <input type="range" id="param-tune-depth" min="0" max="100" value="90" class="slider-rotary">
+                  </div>
+                  <label>Pitch Correction Amount</label>
+                  <span id="tune-depth-val" class="knob-val">90%</span>
+                </div>
+                <div class="knob-control">
+                  <div class="knob-ring" data-param="tune-formant">
+                    <input type="range" id="param-tune-formant" min="-12" max="12" value="0" class="slider-rotary">
+                  </div>
+                  <label>Formant / Gender</label>
+                  <span id="tune-formant-val" class="knob-val">0 (Natural)</span>
+                </div>
+                <div class="knob-control">
+                  <div class="knob-ring" data-param="tune-gate">
+                    <input type="range" id="param-tune-gate" min="0" max="100" value="65" class="slider-rotary">
+                  </div>
+                  <label>Noise Gate / Clean</label>
+                  <span id="tune-gate-val" class="knob-val">65 dB</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. 5-Band Visual Parametric EQ -->
+            <div id="fx-panel-eq" class="fx-panel-section">
+              <div class="fx-header-row">
+                <div class="fx-power-toggle">
+                  <input type="checkbox" id="toggle-eq" checked>
+                  <label for="toggle-eq">Studio EQ Active</label>
+                </div>
+                <div class="eq-presets-quick">
+                  <button class="btn-micro" data-eq="vocal-air">Vocal Air Boost</button>
+                  <button class="btn-micro" data-eq="warm-punch">Warm Bass</button>
+                  <button class="btn-micro" data-eq="flat">Flat Reset</button>
+                </div>
+              </div>
+              <!-- Interactive Visual Canvas EQ Curve -->
+              <div class="eq-visualizer-box">
+                <canvas id="canvas-eq-curve" width="800" height="150"></canvas>
+              </div>
+              <div class="eq-bands-controls">
+                <div class="eq-band-col">
+                  <span class="band-tag">Low Cut (80Hz)</span>
+                  <input type="range" id="eq-low" min="-12" max="12" value="-2" class="slider-vertical">
+                  <span id="eq-low-val">-2 dB</span>
+                </div>
+                <div class="eq-band-col">
+                  <span class="band-tag">Low-Mid (350Hz)</span>
+                  <input type="range" id="eq-lowmid" min="-12" max="12" value="-1" class="slider-vertical">
+                  <span id="eq-lowmid-val">-1 dB</span>
+                </div>
+                <div class="eq-band-col">
+                  <span class="band-tag">Mid Presence (1.5k)</span>
+                  <input type="range" id="eq-mid" min="-12" max="12" value="2" class="slider-vertical">
+                  <span id="eq-mid-val">+2 dB</span>
+                </div>
+                <div class="eq-band-col">
+                  <span class="band-tag">High-Mid (4.5k)</span>
+                  <input type="range" id="eq-highmid" min="-12" max="12" value="3" class="slider-vertical">
+                  <span id="eq-highmid-val">+3 dB</span>
+                </div>
+                <div class="eq-band-col">
+                  <span class="band-tag">Air Shimmer (12k)</span>
+                  <input type="range" id="eq-high" min="-12" max="12" value="4" class="slider-vertical">
+                  <span id="eq-high-val">+4 dB</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. Dynamic Compressor -->
+            <div id="fx-panel-comp" class="fx-panel-section">
+              <div class="fx-header-row">
+                <div class="fx-power-toggle">
+                  <input type="checkbox" id="toggle-comp" checked>
+                  <label for="toggle-comp">Studio Dynamic Compressor Active</label>
+                </div>
+                <div class="gr-meter-display">
+                  <span class="gr-label">Gain Reduction (GR):</span>
+                  <div class="gr-bar-track">
+                    <div id="comp-gr-bar" class="gr-bar-fill"></div>
+                  </div>
+                  <span id="comp-gr-val" class="gr-text">-3.2 dB</span>
+                </div>
+              </div>
+              <div class="knobs-row">
+                <div class="knob-control">
+                  <input type="range" id="param-comp-thresh" min="-40" max="0" value="-20" class="slider-styled">
+                  <label>Threshold</label>
+                  <span id="comp-thresh-val" class="knob-val">-20 dB</span>
+                </div>
+                <div class="knob-control">
+                  <input type="range" id="param-comp-ratio" min="1" max="20" value="4" class="slider-styled">
+                  <label>Ratio</label>
+                  <span id="comp-ratio-val" class="knob-val">4:1</span>
+                </div>
+                <div class="knob-control">
+                  <input type="range" id="param-comp-attack" min="1" max="100" value="15" class="slider-styled">
+                  <label>Attack</label>
+                  <span id="comp-attack-val" class="knob-val">15 ms</span>
+                </div>
+                <div class="knob-control">
+                  <input type="range" id="param-comp-release" min="20" max="500" value="120" class="slider-styled">
+                  <label>Release</label>
+                  <span id="comp-release-val" class="knob-val">120 ms</span>
+                </div>
+                <div class="knob-control">
+                  <input type="range" id="param-comp-gain" min="0" max="12" value="3" class="slider-styled">
+                  <label>Makeup Gain</label>
+                  <span id="comp-gain-val" class="knob-val">+3 dB</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 4. Reverb & Space Delay -->
+            <div id="fx-panel-space" class="fx-panel-section">
+              <div class="fx-header-row">
+                <div class="fx-power-toggle">
+                  <input type="checkbox" id="toggle-reverb" checked>
+                  <label for="toggle-reverb">Lush Studio Reverb & BPM Delay Active</label>
+                </div>
+              </div>
+              <div class="knobs-row">
+                <div class="knob-control">
+                  <input type="range" id="param-rev-decay" min="0.5" max="6.0" step="0.1" value="2.4" class="slider-styled">
+                  <label>Reverb Room Size</label>
+                  <span id="rev-decay-val" class="knob-val">2.4s (Plate)</span>
+                </div>
+                <div class="knob-control">
+                  <input type="range" id="param-rev-mix" min="0" max="100" value="35" class="slider-styled">
+                  <label>Reverb Wet Mix</label>
+                  <span id="rev-mix-val" class="knob-val">35%</span>
+                </div>
+                <div class="knob-control">
+                  <input type="range" id="param-delay-time" min="0.1" max="1.0" step="0.05" value="0.25" class="slider-styled">
+                  <label>Echo Time</label>
+                  <span id="delay-time-val" class="knob-val">1/4 Note (Sync)</span>
+                </div>
+                <div class="knob-control">
+                  <input type="range" id="param-delay-feedback" min="0" max="90" value="35" class="slider-styled">
+                  <label>Echo Feedback</label>
+                  <span id="delay-feedback-val" class="knob-val">35%</span>
+                </div>
+                <div class="knob-control">
+                  <input type="range" id="param-delay-mix" min="0" max="100" value="25" class="slider-styled">
+                  <label>Echo Mix</label>
+                  <span id="delay-mix-val" class="knob-val">25%</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 5. Analog Saturation -->
+            <div id="fx-panel-warmth" class="fx-panel-section">
+              <div class="fx-header-row">
+                <div class="fx-power-toggle">
+                  <input type="checkbox" id="toggle-sat" checked>
+                  <label for="toggle-sat">Tape & Tube Saturation Active</label>
+                </div>
+              </div>
+              <div class="knobs-row">
+                <div class="knob-control">
+                  <input type="range" id="param-sat-drive" min="0" max="100" value="30" class="slider-styled">
+                  <label>Analog Drive / Heat</label>
+                  <span id="sat-drive-val" class="knob-val">30% (Warm Tape)</span>
+                </div>
+                <div class="knob-control">
+                  <input type="range" id="param-sat-warmth" min="0" max="100" value="50" class="slider-styled">
+                  <label>Tube Glow (Low-End)</label>
+                  <span id="sat-warmth-val" class="knob-val">50%</span>
+                </div>
+                <div class="knob-control">
+                  <input type="range" id="param-stereo-width" min="100" max="200" value="135" class="slider-styled">
+                  <label>Stereo Field Width</label>
+                  <span id="stereo-width-val" class="knob-val">135% (Wide)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- TAB 4: 1-CLICK AI MASTERING ENGINE             -->
+    <!-- ============================================== -->
+    <section id="tab-master" class="studio-tab-panel">
+      <div class="master-engine-grid">
+        <!-- Preset Master Cards Deck -->
+        <div class="master-presets-card glass-panel">
+          <div class="panel-header">
+            <div class="panel-title-wrap">
+              <span class="panel-icon">⚡</span>
+              <div>
+                <h2 class="panel-title">1-Click Audience-Ready AI Master</h2>
+                <p class="panel-subtitle">Instant radio & streaming standards mastering matching Top 10 Billboard curves</p>
+              </div>
+            </div>
+            
+            <!-- Real-time Instant A/B Comparison Switch -->
+            <div class="ab-compare-box">
+              <span class="ab-label">A/B TEST:</span>
+              <button id="btn-toggle-ab" class="btn-ab-switch active">
+                <span class="ab-mode ab-a">ORIGINAL MIX</span>
+                <span class="ab-slider-thumb"></span>
+                <span class="ab-mode ab-b active">AI MASTERED</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Master Profile Selector Cards -->
+          <div class="master-profiles-grid">
+            <!-- Profile 1: Streaming Ready -->
+            <div class="master-profile-card active" data-preset="spotify">
+              <div class="profile-badge">STREAMING STANDARD</div>
+              <div class="profile-header">
+                <span class="profile-icon">🟢</span>
+                <h3 class="profile-title">Spotify & Apple Music</h3>
+              </div>
+              <p class="profile-desc">Optimized for -14 LUFS standard. Pristine dynamic range, punchy clarity, and zero harshness on AirPods & phones.</p>
+              <div class="profile-specs">
+                <span class="spec-tag">LUFS: -14.0</span>
+                <span class="spec-tag">Peak: -1.0 dBTP</span>
+                <span class="spec-tag">Air & Glue</span>
+              </div>
+            </div>
+
+            <!-- Profile 2: Club & Radio Punch -->
+            <div class="master-profile-card" data-preset="club">
+              <div class="profile-badge">MAX LOUDNESS</div>
+              <div class="profile-header">
+                <span class="profile-icon">🔥</span>
+                <h3 class="profile-title">Club & Festival Banger</h3>
+              </div>
+              <p class="profile-desc">Loud & aggressive (-9 LUFS). Heavy sub-bass compression, punchy transient snap, wide stereo field.</p>
+              <div class="profile-specs">
+                <span class="spec-tag">LUFS: -9.0</span>
+                <span class="spec-tag">Peak: -0.2 dBTP</span>
+                <span class="spec-tag">Sub Boost + Width</span>
+              </div>
+            </div>
+
+            <!-- Profile 3: Warm Vintage Vinyl -->
+            <div class="master-profile-card" data-preset="vinyl">
+              <div class="profile-badge">ANALOG GLUE</div>
+              <div class="profile-header">
+                <span class="profile-icon">📻</span>
+                <h3 class="profile-title">Warm Tape & Vinyl</h3>
+              </div>
+              <p class="profile-desc">Analog harmonic tape saturation, smooth rolled-off highs, rich tube warmth for Lo-Fi, R&B, and Soul.</p>
+              <div class="profile-specs">
+                <span class="spec-tag">LUFS: -13.0</span>
+                <span class="spec-tag">Peak: -1.2 dBTP</span>
+                <span class="spec-tag">Tube Saturation</span>
+              </div>
+            </div>
+
+            <!-- Profile 4: Crisp Vocal Pop -->
+            <div class="master-profile-card" data-preset="pop">
+              <div class="profile-badge">VOCAL FOCUS</div>
+              <div class="profile-header">
+                <span class="profile-icon">✨</span>
+                <h3 class="profile-title">Modern Crisp Vocal Pop</h3>
+              </div>
+              <p class="profile-desc">Ultra-bright top-end shimmer, mid-range vocal presence boost, and transparent multiband gluing.</p>
+              <div class="profile-specs">
+                <span class="spec-tag">LUFS: -11.5</span>
+                <span class="spec-tag">Peak: -0.5 dBTP</span>
+                <span class="spec-tag">Exciter + Dynamic EQ</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Master DSP Fine-Tuning Deck -->
+          <div class="master-fine-tune">
+            <h4 class="fine-tune-title">Fine-Tune AI Master:</h4>
+            <div class="fine-tune-controls">
+              <div class="fine-tune-item">
+                <label>Target Loudness</label>
+                <input type="range" id="master-target-lufs" min="-18" max="-7" step="0.5" value="-14" class="slider-styled">
+                <span id="master-lufs-val" class="param-val">-14.0 LUFS</span>
+              </div>
+              <div class="fine-tune-item">
+                <label>Stereo Width</label>
+                <input type="range" id="master-width" min="100" max="180" value="130" class="slider-styled">
+                <span id="master-width-val" class="param-val">130%</span>
+              </div>
+              <div class="fine-tune-item">
+                <label>High-End Exciter</label>
+                <input type="range" id="master-exciter" min="0" max="100" value="40" class="slider-styled">
+                <span id="master-exciter-val" class="param-val">40%</span>
+              </div>
+              <div class="fine-tune-item">
+                <label>Low-End Glue (808s)</label>
+                <input type="range" id="master-bass-glue" min="0" max="100" value="60" class="slider-styled">
+                <span id="master-glue-val" class="param-val">60%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Master Analytics, Spectrum & Loudness Meter Deck -->
+        <div class="master-analytics-card glass-panel">
+          <div class="panel-header">
+            <div class="panel-title-wrap">
+              <span class="panel-icon">📊</span>
+              <div>
+                <h3 class="panel-title">Master Spectral & Loudness Analysis</h3>
+                <p class="panel-subtitle">Real-time True-Peak, LUFS & Frequency Spectrum</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Spectrum Analyzer Canvas -->
+          <div class="spectrum-canvas-wrap">
+            <canvas id="canvas-master-spectrum" width="800" height="200"></canvas>
+          </div>
+
+          <!-- Loudness Meter Readouts -->
+          <div class="loudness-metrics-grid">
+            <div class="metric-card">
+              <span class="metric-label">INTEGRATED LOUDNESS</span>
+              <span id="metric-lufs-readout" class="metric-val font-mono">-14.1 <small>LUFS</small></span>
+              <span class="metric-status status-good">Spotify Target Hit ✅</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-label">TRUE PEAK MAX</span>
+              <span id="metric-peak-readout" class="metric-val font-mono">-0.9 <small>dBTP</small></span>
+              <span class="metric-status status-good">Zero Intersample Clipping ✅</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-label">DYNAMIC RANGE</span>
+              <span id="metric-dr-readout" class="metric-val font-mono">10.4 <small>dB</small></span>
+              <span class="metric-status">Optimal Commercial Punch</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- TAB 5: AUDIENCE READY EXPORT & PACKAGING       -->
+    <!-- ============================================== -->
+    <section id="tab-export" class="studio-tab-panel">
+      <div class="export-workspace-grid">
+        <!-- Release Artwork & Visualizer Creator Deck -->
+        <div class="artwork-card glass-panel">
+          <div class="panel-header">
+            <div class="panel-title-wrap">
+              <span class="panel-icon">🎨</span>
+              <div>
+                <h2 class="panel-title">Track Packaging & AI Cover Art</h2>
+                <p class="panel-subtitle">Audience-ready visuals for Spotify, Apple Music & Instagram</p>
+              </div>
+            </div>
+            <button id="btn-random-artwork" class="btn-text-action">🎲 Randomize Cover</button>
+          </div>
+
+          <div class="artwork-workspace">
+            <!-- Cover Art Canvas / Preview -->
+            <div class="cover-art-container">
+              <canvas id="canvas-cover-art" width="600" height="600"></canvas>
+              <div class="cover-art-overlay-info">
+                <span class="cover-watermark">SOUNDCRAFT MASTERED</span>
+              </div>
+            </div>
+
+            <!-- Artwork Customizer Controls -->
+            <div class="artwork-controls">
+              <div class="art-input-group">
+                <label>Track Title</label>
+                <input type="text" id="input-track-title" value="Midnight Velocity" class="input-styled">
+              </div>
+              <div class="art-input-group">
+                <label>Artist Name</label>
+                <input type="text" id="input-artist-name" value="Future Wave" class="input-styled">
+              </div>
+              <div class="art-input-group">
+                <label>Visual Style Theme</label>
+                <select id="select-art-theme" class="select-styled">
+                  <option value="cyberpunk">🌆 Neon Cyberpunk</option>
+                  <option value="cosmic">🌌 Cosmic Astral Nebula</option>
+                  <option value="retro">📻 Retro Vintage Tape</option>
+                  <option value="minimal">🖤 Minimalist Dark Studio</option>
+                  <option value="sunset">🌅 Vaporwave Sunset</option>
+                  <option value="gold">👑 Platinum Luxury</option>
+                </select>
+              </div>
+              <div class="art-input-group">
+                <label>Cover Graphic FX</label>
+                <div class="fx-checkboxes">
+                  <label><input type="checkbox" id="art-show-vinyl" checked> Vinyl Groove</label>
+                  <label><input type="checkbox" id="art-show-glow" checked> Cyber Glow</label>
+                  <label><input type="checkbox" id="art-show-badge" checked> Master Badge</label>
+                </div>
+              </div>
+              <button id="btn-download-cover" class="btn-secondary btn-full">
+                <span>🖼️ Download Cover Art (4K PNG)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Master Audio Bounce & Audience Export Deck -->
+        <div class="bounce-card glass-panel">
+          <div class="panel-header">
+            <div class="panel-title-wrap">
+              <span class="panel-icon">🚀</span>
+              <div>
+                <h2 class="panel-title">Audience-Ready Song Export</h2>
+                <p class="panel-subtitle">Export in high-fidelity studio formats with 1-click distribution readiness</p>
+              </div>
+            </div>
+            <span class="ready-badge">✅ MASTER READY</span>
+          </div>
+
+          <!-- Master Summary Card -->
+          <div class="master-summary-box">
+            <div class="summary-track-info">
+              <span class="summary-title" id="summary-display-title">Midnight Velocity</span>
+              <span class="summary-artist" id="summary-display-artist">by Future Wave</span>
+            </div>
+            <div class="summary-specs-list">
+              <div class="spec-row">
+                <span>Master Profile:</span>
+                <strong id="summary-master-profile">Spotify & Apple Music Standard</strong>
+              </div>
+              <div class="spec-row">
+                <span>Key & BPM:</span>
+                <strong id="summary-bpm-key">130 BPM • A Minor</strong>
+              </div>
+              <div class="spec-row">
+                <span>Target Loudness:</span>
+                <strong id="summary-lufs-val">-14.0 LUFS (Optimal)</strong>
+              </div>
+              <div class="spec-row">
+                <span>Audio Resolution:</span>
+                <strong>24-Bit / 48kHz Broadcast Studio Quality</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Export Action Buttons -->
+          <div class="export-actions-grid">
+            <button id="btn-export-wav" class="btn-export-card btn-export-primary">
+              <div class="export-icon-wrap">
+                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+              </div>
+              <div class="export-btn-content">
+                <span class="export-main-title">Export Lossless Master (WAV)</span>
+                <span class="export-sub-title">24-Bit / 48kHz Broadcast Studio Quality (Streaming / DistroKid / TuneCore ready)</span>
+              </div>
+            </button>
+
+            <button id="btn-export-mp3" class="btn-export-card">
+              <div class="export-icon-wrap">
+                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+              </div>
+              <div class="export-btn-content">
+                <span class="export-main-title">Export High-Quality MP3</span>
+                <span class="export-sub-title">320kbps MP3 with embedded artwork & metadata</span>
+              </div>
+            </button>
+
+            <button id="btn-export-stems" class="btn-export-card">
+              <div class="export-icon-wrap">
+                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+              </div>
+              <div class="export-btn-content">
+                <span class="export-main-title">Export Individual Stems</span>
+                <span class="export-sub-title">Download isolated Drums, 808 Bass, Synth & Vocal audio files</span>
+              </div>
+            </button>
+          </div>
+
+          <!-- Interactive Social Video / Visualizer Preview -->
+          <div class="social-visualizer-preview">
+            <div class="social-header">
+              <span>📱 Live Social Media Audio Visualizer:</span>
+              <button id="btn-toggle-fullscreen-vis" class="btn-micro">Fullscreen ⛶</button>
+            </div>
+            <div class="vis-preview-box">
+              <canvas id="canvas-social-visualizer" width="700" height="220"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Notification Toast & Modal Container -->
+  <div id="studio-toast" class="toast-notification hidden">
+    <span id="toast-icon">✨</span>
+    <span id="toast-message">AI Beat generated successfully!</span>
+  </div>
+
+  <!-- JavaScript Modules -->
+  <script src="js/audio/audio-context.js"></script>
+  <script src="js/audio/synth-engine.js"></script>
+  <script src="js/audio/ai-beat-generator.js"></script>
+  <script src="js/audio/recorder.js"></script>
+  <script src="js/audio/effects-chain.js"></script>
+  <script src="js/audio/master-engine.js"></script>
+  <script src="js/ui/sequencer-ui.js"></script>
+  <script src="js/ui/mixer-ui.js"></script>
+  <script src="js/ui/visualizer.js"></script>
+  <script src="js/ui/cover-art.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
